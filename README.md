@@ -37,4 +37,5 @@ Arcade
 
 * Future addition: Enemies! A shooter of any perspective needs enemies to shoot!
 * Future addition: A win/loss condition and ending to the game.
-* Future Addition: Add GUI elements, things like a health bar, something to show the player when they've reloaded. Maybe even the ability to select different shells or abilities.
+* Future addition: Add GUI elements, things like a health bar, something to show the player when they've reloaded. Maybe even the ability to select different shells or abilities.
+* Future addition: Start menu with the ability to select how many enemies and which tank the player wants to use.
