@@ -74,7 +74,7 @@ class Tank():
     
     def right(self):
         self.hull_sprite.angle -= self.hull_traverse
-    # Forward, reverse, and decleration
+    # Forward, reverse, and deceleration
     def forward(self):
         self.is_moving = True
         self.hull_sprite.center_x += math.cos(math.radians(self.hull_sprite.angle + 90)) * (self.speed)
@@ -289,9 +289,11 @@ class Game(arcade.Window):
             player_bullet.sprite.angle = self.player.turret_sprite.angle
             player_bullet.sprite.center_x = self.player.turret_sprite.center_x
             player_bullet.sprite.center_y = self.player.turret_sprite.center_y
+            # Play the tank cannon sound
             arcade.play_sound(player_bullet.sound)
             self.player_bullets.append(player_bullet)
             self.player_bullet_sprites.append(player_bullet.sprite)
+            # Sets the reload to true so there is time between shots.
             self.player.reloading = True
             self.player.reload_timer = 0
         
