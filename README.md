@@ -1,10 +1,15 @@
 # Overview
 
-{Important!  Do not say in this section that this is college assignment.  Talk about what you are trying to accomplish as a software engineer to further your learning.}
 
-{Provide a description the game that you wrote. Describe how to play your game.}
+A top-down shooter where the player is a tank. The player can move the tank using either the arrow keys or WASD:
+* W to move forward.
+* S to move backward.
+* A to turn left.
+* D to turn right.
 
-{Describe your purpose for writing this software.}
+The turret will follow the mouse position within the window. Players will have to take into account acceleration, deceleration, reload speed, and the turret rotation speed. (In its current state there is no enemies though, just trees to shoot.)
+
+I think that creating games is a really fun thing to do and is excellent motivation for creating projects that challenge anyones programming skills. I also wanted to make a game that my kids could play that is quick.
 
 {Provide a link to your YouTube demonstration.  It should be a 4-5 minute demo of the game being played and a walkthrough of the code.}
 
@@ -12,19 +17,24 @@
 
 # Development Environment
 
-{Describe the tools that you used to develop the software}
+Visual Studio Code
+GitHub
 
-{Describe the programming language that you used and any libraries.}
+Python 3.9.7
+Arcade
 
 # Useful Websites
 
 {Make a list of websites that you found helpful in this project}
-* [Web Site Name](http://url.link.goes.here)
-* [Web Site Name](http://url.link.goes.here)
+* [Python Arcade: How to Code Examples](https://api.arcade.academy/en/latest/examples/index.html#how-to-example-code)
+* [Freesound - Tank Cannon by GaryQ](https://freesound.org/s/127845/)
+* [Kenny.nl - Free sprites](https://kenney.nl/)
+* [Itch.io - Tank sprite by jh2assets](https://jimhatama.itch.io/)
+* [Python Arcade: Built-in Resources](https://api.arcade.academy/en/latest/resources.html)
+* [Youtube - Sprite and Spritelist tutorial](https://youtu.be/LQ3r36uyHNY)
 
 # Future Work
 
-{Make a list of things that you need to fix, improve, and add in the future.}
-* Item 1
-* Item 2
-* Item 3
+* Future addition: Enemies! A shooter of any perspective needs enemies to shoot!
+* Future addition: A win/loss condition and ending to the game.
+* Future Addition: Add GUI elements, things like a health bar, something to show the player when they've reloaded. Maybe even the ability to select different shells or abilities.
