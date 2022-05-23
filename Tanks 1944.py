@@ -1,7 +1,8 @@
 # By Soren Reber
 '''
 Tank sprites found on itch.io by author jh2assets https://jimhatama.itch.io/
-Rock and bullet sprites is free from Kenny.nl, https://kenney.nl/
+Rock and bullet sprites is free from Kenny.nl https://kenney.nl/
+Tank Cannon sound is from Freesound and is by GaryQ https://freesound.org/s/127845/
 '''
 import random
 import arcade
@@ -12,16 +13,10 @@ SCREEN_WIDTH = 1200
 SCREEN_HEIGHT = 900
 SCREEN_TITLE = "Tanks 1944"
 
-
 class Environment():
     def __init__(self, img):
         self.img = img
         self.sprite = arcade.Sprite(img, .5)
-
-class Bush(Environment):
-    def __init__(self):
-        super().__init__(":resources:images/topdown_tanks/treeGreen_small.png")
-
   
 class Tree(Environment):
     def __init__(self):
@@ -30,7 +25,6 @@ class Tree(Environment):
 class Rock(Environment):
     def __init__(self):
         super().__init__('environment_png/rock_2.png')
-
 
 class Tank():
     def __init__(self, hull_img, turret_img):      
@@ -43,8 +37,8 @@ class Tank():
  
         # Hull
         self.hull_sprite = arcade.Sprite(hull_img, 1)
-        self.hull_sprite.center_x = 50
-        self.hull_sprite.center_y = 50
+        self.hull_sprite.center_x = 0
+        self.hull_sprite.center_y = 0
         self.hull_sprite.angle = 0
         self.hull_traverse = 0.5
 
@@ -61,6 +55,7 @@ class Tank():
         self.turret_sprite.center_x = self.hull_sprite.center_x
         self.turret_sprite.center_y = self.hull_sprite.center_y
 
+    # Keep the sprite within the arcade window.
     def screen_edge(self, screen_width, screen_height):
         if self.hull_sprite.center_x + (self.hull_sprite.width / 5) >= screen_width: # x increases "right" ->
             self.hull_sprite.center_x = screen_width - (self.hull_sprite.width / 5) 
@@ -73,13 +68,13 @@ class Tank():
         
         if self.hull_sprite.center_y - (self.hull_sprite.height / 5) <= 0 :# y decreases "down"
             self.hull_sprite.center_y = 0 + (self.hull_sprite.height / 5)
-
-    def left(self): # Change angle
+    # Change angle
+    def left(self):
         self.hull_sprite.angle += self.hull_traverse
     
     def right(self):
         self.hull_sprite.angle -= self.hull_traverse
-
+    # Forward, reverse, and decleration
     def forward(self):
         self.is_moving = True
         self.hull_sprite.center_x += math.cos(math.radians(self.hull_sprite.angle + 90)) * (self.speed)
@@ -112,13 +107,19 @@ class Tank():
                 self.speed = 0
 
     def rotate_turret(self, target_angle_radians):
+        '''
+        This function rotates the turret, but most importantly, it will tell the turret to
+        switch the direction it is rotating to the most optimum direction.
+        The arcade website has excellent examples and I used example code for rotating a 
+        tank and altered it to apply to the tank turret.
+        '''
         if target_angle_radians < 0:
             target_angle_radians += 2 * math.pi
         current_angle_radians = math.radians(self.turret_sprite.angle + 90)
         rot_speed_radians = math.radians(self.turret_traverse)
-        # What is the difference between what we want, and where we are?
+        # Angle difference between mouse position and current turret angle.
         angle_diff_radians = target_angle_radians - current_angle_radians
-        # Figure out if we rotate clockwise or counter-clockwise
+        # Figure out if we rotate clockwise or counter-clockwise based off the difference.
         if abs(angle_diff_radians) <= rot_speed_radians:
             current_angle_radians = target_angle_radians
             clockwise = None
@@ -172,7 +173,8 @@ class Enemy_bullet(Bullet):
 
 class Player(Tank):
     def __init__(self):
-        super().__init__("ww2_tanks_top_export\Tiger\ww2_top_view_hull3.png", "ww2_tanks_top_export\Tiger\ww2_top_view_turret3.png")
+        super().__init__("ww2_tanks_top_export\Tiger\ww2_top_view_hull3.png",
+                        "ww2_tanks_top_export\Tiger\ww2_top_view_turret3.png")
         self.max_speed = .75
         self.max_reverse_speed = -0.25
         self.acceleration = 0.005
@@ -180,10 +182,10 @@ class Player(Tank):
         self.reload_speed = 180
         self.reload_timer = 0
         self.reloading = False
-        
         # Hull
         self.hull_sprite.center_x = SCREEN_WIDTH / 2
         self.hull_sprite.center_y = 50
+        # Turret
         self.target_angle = 0
         self.turret_sprite.center_x = self.hull_sprite.center_x
         self.turret_sprite.center_y = self.hull_sprite.center_y
@@ -191,18 +193,15 @@ class Player(Tank):
     def reload(self):
         if self.reloading:
             self.reload_timer += 1
-            print(self.reload_timer)
         if self.reload_timer == self.reload_speed:
             self.reloading = False
             self.reload_timer = 0
-
 
     def aim_at_point(self, mouse_x, mouse_y):
         x_diff = mouse_x - self.hull_sprite.center_x
         y_diff = mouse_y - self.hull_sprite.center_y
         target_angle = math.atan2(y_diff, x_diff)
         return target_angle
-
  
 class Game(arcade.Window):
     def __init__(self):
@@ -210,11 +209,9 @@ class Game(arcade.Window):
         arcade.set_background_color(arcade.color.ARMY_GREEN)
         # Initialize player
         self.player = Player()
-
         # Start Music
         bg_music = arcade.load_sound(":resources:music/1918.mp3", True)
         arcade.play_sound(bg_music, looping= True)
-        
         # Lists
         self.player_bullets = []
         self.enemies_list = []
@@ -225,16 +222,16 @@ class Game(arcade.Window):
 
     def setup(self):
         # Create a random number of trees and add to the tree_list.
-        for i in range(random.randint(5, 15)):
+        for _ in range(random.randint(5, 15)):
             tree = Tree()
             tree.sprite.center_x = random.randint(35, SCREEN_WIDTH - 35)
-            tree.sprite.center_y = random.randint(35, SCREEN_HEIGHT - 35)
+            tree.sprite.center_y = random.randint(50, SCREEN_HEIGHT - 35)
             self.tree_list.append(tree.sprite)
         # Create a random number of rocks and add to the rock_list.
-        for i in range(random.randint(8, 20)):
+        for _ in range(random.randint(8, 20)):
             rock = Rock()
             rock.sprite.center_x = random.randint(35, SCREEN_WIDTH - 35)
-            rock.sprite.center_y = random.randint(35, SCREEN_HEIGHT - 35)
+            rock.sprite.center_y = random.randint(50, SCREEN_HEIGHT - 35)
             rock.sprite.angle = random.randrange(0, 180)
             self.rock_list.append(rock.sprite)
 
