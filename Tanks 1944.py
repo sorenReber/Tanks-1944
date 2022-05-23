@@ -1,11 +1,11 @@
+# By Soren Reber
 '''
 Tank sprites found on itch.io by author jh2assets https://jimhatama.itch.io/
+Rock and bullet sprites is free from Kenny.nl, https://kenney.nl/
 '''
 import random
 import arcade
 import math
-
-from numpy import angle
 
 # Constants
 SCREEN_WIDTH = 1200
@@ -159,6 +159,8 @@ class Player_bullet(Bullet):
         super().__init__()
         self.damage = 50
         self.bullet_speed = 5.5
+        self.sound = arcade.load_sound("tank-fire.wav")
+
     def check_collisions(self, list_1, list_2):
         hit = arcade.check_for_collision_with_lists(self.sprite, [list_1, list_2], 2)
         return hit
@@ -175,6 +177,9 @@ class Player(Tank):
         self.max_reverse_speed = -0.25
         self.acceleration = 0.005
         self.hit_points = 100
+        self.reload_speed = 180
+        self.reload_timer = 0
+        self.reloading = False
         
         # Hull
         self.hull_sprite.center_x = SCREEN_WIDTH / 2
@@ -182,6 +187,15 @@ class Player(Tank):
         self.target_angle = 0
         self.turret_sprite.center_x = self.hull_sprite.center_x
         self.turret_sprite.center_y = self.hull_sprite.center_y
+
+    def reload(self):
+        if self.reloading:
+            self.reload_timer += 1
+            print(self.reload_timer)
+        if self.reload_timer == self.reload_speed:
+            self.reloading = False
+            self.reload_timer = 0
+
 
     def aim_at_point(self, mouse_x, mouse_y):
         x_diff = mouse_x - self.hull_sprite.center_x
@@ -196,6 +210,10 @@ class Game(arcade.Window):
         arcade.set_background_color(arcade.color.ARMY_GREEN)
         # Initialize player
         self.player = Player()
+
+        # Start Music
+        bg_music = arcade.load_sound(":resources:music/1918.mp3", True)
+        arcade.play_sound(bg_music, looping= True)
         
         # Lists
         self.player_bullets = []
@@ -227,19 +245,25 @@ class Game(arcade.Window):
         self.tree_list.draw()
         self.rock_list.draw()
 
-
     def on_update(self, delta_time: float):
         self.check_keys()
         self.player.deceleration()
         self.player.screen_edge(SCREEN_WIDTH, SCREEN_HEIGHT)
         self.player.rotate_turret(self.player.target_angle)
+        self.player.reload()
         for bullet in self.player_bullets:
             bullet.update()
-        
+        # Check the bullets for collisions and if they are off screen.
         for bullet in self.player_bullet_sprites:
-            hit = arcade.check_for_collision_with_lists(bullet, [self.tree_list, self.rock_list], 2)
-            if len(hit) > 0:
+            bullet_hit = arcade.check_for_collision_with_lists(bullet, [self.tree_list, self.rock_list], 2)
+            if len(bullet_hit) > 0:
                 bullet.remove_from_sprite_lists()
+            if bullet.bottom > SCREEN_HEIGHT or bullet.left > SCREEN_WIDTH or bullet.bottom < 0 or bullet.left < 0:
+                bullet.remove_from_sprite_lists()
+            # Check trees for collision with bullets
+            for tree in self.tree_list:
+                if tree in bullet_hit:
+                    tree.remove_from_sprite_lists()
         
     def check_keys(self):
         if arcade.key.LEFT in self.key_list or arcade.key.A in self.key_list:
@@ -262,12 +286,17 @@ class Game(arcade.Window):
         self.player.target_angle = self.player.aim_at_point(x, y)
 
     def on_mouse_press(self, x, y, button, modifier):
-        player_bullet = Player_bullet()
-        player_bullet.sprite.angle = self.player.turret_sprite.angle
-        player_bullet.sprite.center_x = self.player.turret_sprite.center_x
-        player_bullet.sprite.center_y = self.player.turret_sprite.center_y
-        self.player_bullets.append(player_bullet)
-        self.player_bullet_sprites.append(player_bullet.sprite)
+        # Creates a bullet sprite and object. Append the sprite to a sprite list and the object to an object list.
+        if self.player.reloading == False:
+            player_bullet = Player_bullet()
+            player_bullet.sprite.angle = self.player.turret_sprite.angle
+            player_bullet.sprite.center_x = self.player.turret_sprite.center_x
+            player_bullet.sprite.center_y = self.player.turret_sprite.center_y
+            arcade.play_sound(player_bullet.sound)
+            self.player_bullets.append(player_bullet)
+            self.player_bullet_sprites.append(player_bullet.sprite)
+            self.player.reloading = True
+            self.player.reload_timer = 0
         
 
 if __name__ == "__main__":
