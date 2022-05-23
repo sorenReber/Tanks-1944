@@ -7,7 +7,7 @@ A top-down shooter where the player is a tank. The player can move the tank usin
 * A to turn left.
 * D to turn right.
 
-The turret will follow the mouse position within the window. Players will have to take into account acceleration, deceleration, reload speed, and the turret rotation speed. (In its current state there is no enemies though, just trees to shoot.)
+The turret will follow the mouse position within the window. Players will have to take into account acceleration, deceleration, reload speed, and the turret rotation speed. (In its current state there are no enemies though, just trees to shoot.)
 
 I think that creating games is a really fun thing to do and is excellent motivation for creating projects that challenge anyones programming skills. I also wanted to make a game that my kids could play that is quick.
 
