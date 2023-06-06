@@ -1,0 +1,5 @@
+6/4/2023
+- Improved the game window by maximizing the screen.
+- First iteration of enemies.
+    - Random number of enemies at the start of the game, they currently don't move but they do track the player
+    with their turret.

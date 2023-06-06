@@ -9,8 +9,9 @@ import arcade
 import math
 
 # Constants
-SCREEN_WIDTH = 1200
-SCREEN_HEIGHT = 900
+SCREEN = arcade.get_display_size()
+SCREEN_WIDTH = SCREEN[0]
+SCREEN_HEIGHT = SCREEN[1]
 SCREEN_TITLE = "Tanks 1944"
 
 class Environment():
@@ -185,10 +186,12 @@ class Player(Tank):
         # Hull
         self.hull_sprite.center_x = SCREEN_WIDTH / 2
         self.hull_sprite.center_y = 50
+
         # Turret
         self.target_angle = 0
         self.turret_sprite.center_x = self.hull_sprite.center_x
         self.turret_sprite.center_y = self.hull_sprite.center_y
+        
 
     def reload(self):
         if self.reloading:
@@ -202,10 +205,39 @@ class Player(Tank):
         y_diff = mouse_y - self.hull_sprite.center_y
         target_angle = math.atan2(y_diff, x_diff)
         return target_angle
- 
+
+# Attempt at AI enemy - Motionless at first!
+class Enemy(Tank):
+    def __init__(self):
+        super().__init__("ww2_tanks_top_export\Tiger\ww2_top_view_hull3.png",
+                        "ww2_tanks_top_export\Tiger\ww2_top_view_turret3.png")
+        #self.max_speed = .75
+        #self.max_reverse_speed = -0.25
+       # self.acceleration = 0.005
+        self.hit_points = 100
+        self.reload_speed = 180
+        self.reload_timer = 0
+        self.reloading = False
+        # Hull
+        self.hull_sprite.center_x = SCREEN_WIDTH / 2
+        self.hull_sprite.center_y = 850
+        self.hull_sprite.angle = 180
+        # Turret
+        self.target_angle = 0
+        self.turret_sprite.center_x = self.hull_sprite.center_x
+        self.turret_sprite.center_y = self.hull_sprite.center_y
+        self.turret_sprite.angle = 180
+
+    def aim_at_player(self, target_x, target_y):
+        x_diff = target_x - self.hull_sprite.center_x
+        y_diff = target_y - self.hull_sprite.center_y
+        target_angle = math.atan2(y_diff, x_diff)
+        return target_angle
+
 class Game(arcade.Window):
     def __init__(self):
-        super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+        super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, center_window=True)
+        arcade.Window.maximize(self)
         arcade.set_background_color(arcade.color.ARMY_GREEN)
         # Initialize player
         self.player = Player()
@@ -219,6 +251,8 @@ class Game(arcade.Window):
         self.tree_list = arcade.SpriteList()
         self.rock_list = arcade.SpriteList()
         self.player_bullet_sprites = arcade.SpriteList()
+        self.enemies_sprites = arcade.SpriteList()
+        
 
     def setup(self):
         # Create a random number of trees and add to the tree_list.
@@ -234,6 +268,13 @@ class Game(arcade.Window):
             rock.sprite.center_y = random.randint(50, SCREEN_HEIGHT - 35)
             rock.sprite.angle = random.randrange(0, 180)
             self.rock_list.append(rock.sprite)
+        for _ in range(random.randint(3, 8)):
+            enemy = Enemy()
+            enemy.hull_sprite.center_x = random.randint(50, SCREEN_WIDTH - 50)
+            enemy.hull_sprite.center_y = random.randint(450, SCREEN_HEIGHT - 50)
+            self.enemies_list.append(enemy)
+            enemy_sprite = [enemy.hull_sprite, enemy.turret_sprite]
+            self.enemies_sprites.extend(enemy_sprite)
 
     def on_draw(self):
         arcade.start_render()
@@ -241,6 +282,8 @@ class Game(arcade.Window):
         self.player.on_draw()
         self.tree_list.draw()
         self.rock_list.draw()
+        for enemy in self.enemies_list:
+            enemy.on_draw()
 
     def on_update(self, delta_time: float):
         self.check_keys()
@@ -248,11 +291,17 @@ class Game(arcade.Window):
         self.player.screen_edge(SCREEN_WIDTH, SCREEN_HEIGHT)
         self.player.rotate_turret(self.player.target_angle)
         self.player.reload()
+
+        # Enemy targeting
+        for enemy in self.enemies_list:
+            player_target = enemy.aim_at_player(self.player.hull_sprite.center_x, self.player.hull_sprite.center_y)
+            enemy.rotate_turret(player_target)
+
         for bullet in self.player_bullets:
             bullet.update()
         # Check the bullets for collisions and if they are off screen.
         for bullet in self.player_bullet_sprites:
-            bullet_hit = arcade.check_for_collision_with_lists(bullet, [self.tree_list, self.rock_list], 2)
+            bullet_hit = arcade.check_for_collision_with_lists(bullet, [self.tree_list, self.rock_list, self.enemies_sprites], 2)
             if len(bullet_hit) > 0:
                 bullet.remove_from_sprite_lists()
             if bullet.bottom > SCREEN_HEIGHT or bullet.left > SCREEN_WIDTH or bullet.bottom < 0 or bullet.left < 0:
@@ -261,6 +310,9 @@ class Game(arcade.Window):
             for tree in self.tree_list:
                 if tree in bullet_hit:
                     tree.remove_from_sprite_lists()
+            for enemy in self.enemies_sprites:
+                if enemy in bullet_hit:
+                    enemy.remove_from_sprite_lists()
         
     def check_keys(self):
         if arcade.key.LEFT in self.key_list or arcade.key.A in self.key_list:
