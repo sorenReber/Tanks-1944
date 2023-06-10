@@ -244,8 +244,7 @@ class Enemy(Tank):
         '''
         This function rotates the hull, but most importantly, it will tell the enemy to
         switch the direction it is rotating to the most optimum direction.
-        The arcade website has excellent examples and I used example code for rotating a 
-        tank.
+        Repurposed the turret traverse function to apply to the hull of the tank.
         '''
         if target_angle_radians < 0:
             target_angle_radians += 2 * math.pi
