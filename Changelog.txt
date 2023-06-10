@@ -1,3 +1,10 @@
+6/11/2023 v.0003
+- Broke the code into multiple files, partially as a test to see how it would work but also to help find specific parts of the game as things
+keep getting added. I'm also thinking about switching the engine to pygame as Kivy uses that and I think that would make it simpler to add
+GUI elements, a main menu, and other things like tank selection.
+- Enemies now will start off the screen and come in from the top of the screen. Will now need to implement a timer to spawn in additional
+enemies as the game goes on.
+
 6/10/2023 v.0002
 - Logic for tank round hitting an enemy is in place, including basic hit points and damage.
     -- Enemies are removed when their health gets to zero or below.
