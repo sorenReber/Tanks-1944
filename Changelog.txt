@@ -1,5 +1,11 @@
-6/4/2023
+6/10/2023 v.0002
+- Logic for tank round hitting an enemy is in place, including basic hit points and damage.
+    -- Enemies are removed when their health gets to zero or below.
+- Enemies don't start aiming at player until they are spawned in, currently set to spawn in based on the y axis position of the player.
+- Enemies will now also start moving at the player!
+
+6/4/2023 v.0001
 - Improved the game window by maximizing the screen.
 - First iteration of enemies.
-    - Random number of enemies at the start of the game, they currently don't move but they do track the player
+    -- Random number of enemies at the start of the game, they currently don't move but they do track the player
     with their turret.

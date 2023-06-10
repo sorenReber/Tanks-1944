@@ -6,8 +6,9 @@ A top-down shooter where the player is a tank. The player can move the tank usin
 * S to move backward.
 * A to turn left.
 * D to turn right.
+* Left mouse button fires the gun.
 
-The turret will follow the mouse position within the window. Players will have to take into account acceleration, deceleration, reload speed, and the turret rotation speed. (In its current state there are no enemies though, just trees to shoot.)
+The turret will follow the mouse position within the window. Players will have to take into account acceleration, deceleration, reload speed, and the turret rotation speed.
 
 I think that creating games is a really fun thing to do and is excellent motivation for creating projects that challenge anyones programming skills. I also wanted to make a game that my kids could play that is quick to get into and pick up.
 
@@ -35,7 +36,13 @@ Arcade
 
 # Future Work
 
-* Future addition: Enemies! A shooter of any perspective needs enemies to shoot!
+* ~~Future addition: Enemies! A shooter of any perspective needs enemies to shoot!~~ Basic enemies added!
 * Future addition: A win/loss condition and ending to the game.
-* Future addition: Add GUI elements, things like a health bar, something to show the player when they've reloaded. Maybe even the ability to select different shells or abilities.
+* Future addition: Add GUI elements, things like a health bar, something to show the player when they've reloaded. Maybe even the ability to select different shells.
 * Future addition: Start menu with the ability to select how many enemies and which tank the player wants to use.
+_____________________________
+* New Future additions
+_____________________________
+* Enemies that move and shoot back!
+* Different tank types, ablity to choose the player tank as mentioned above. Different stats dependent on the type of tank, i.e. damage/armor piercing, damage resistance/armor, top speed, acceleration, etc.
+* Bullet deviation, it shouldn't be a laser straight shot. Scale with distance, small to medium chance for shot to fall short or over shoot?

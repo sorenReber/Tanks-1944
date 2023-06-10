@@ -211,9 +211,9 @@ class Enemy(Tank):
     def __init__(self):
         super().__init__("ww2_tanks_top_export\Tiger\ww2_top_view_hull3.png",
                         "ww2_tanks_top_export\Tiger\ww2_top_view_turret3.png")
-        #self.max_speed = .75
+        self.max_speed = .35
         #self.max_reverse_speed = -0.25
-       # self.acceleration = 0.005
+        self.acceleration = 0.005
         self.hit_points = 100
         self.reload_speed = 180
         self.reload_timer = 0
@@ -227,12 +227,56 @@ class Enemy(Tank):
         self.turret_sprite.center_x = self.hull_sprite.center_x
         self.turret_sprite.center_y = self.hull_sprite.center_y
         self.turret_sprite.angle = 180
+        # AI? Bot behavior?
+        self.spawned_in = False
 
     def aim_at_player(self, target_x, target_y):
         x_diff = target_x - self.hull_sprite.center_x
         y_diff = target_y - self.hull_sprite.center_y
         target_angle = math.atan2(y_diff, x_diff)
         return target_angle
+    
+    def take_damage(self, damage_amount):
+        self.hit_points -= damage_amount
+        return self.hit_points
+    
+    def rotate_hull(self, target_angle_radians):
+        '''
+        This function rotates the hull, but most importantly, it will tell the enemy to
+        switch the direction it is rotating to the most optimum direction.
+        The arcade website has excellent examples and I used example code for rotating a 
+        tank.
+        '''
+        if target_angle_radians < 0:
+            target_angle_radians += 2 * math.pi
+        current_angle_radians = math.radians(self.hull_sprite.angle + 90)
+        rot_speed_radians = math.radians(self.hull_traverse)
+        # Angle difference between mouse position and current turret angle.
+        angle_diff_radians = target_angle_radians - current_angle_radians
+        # Figure out if we rotate clockwise or counter-clockwise based off the difference.
+        if abs(angle_diff_radians) <= rot_speed_radians:
+            current_angle_radians = target_angle_radians
+            clockwise = None
+        elif angle_diff_radians > 0 and abs(angle_diff_radians) < math.pi:
+            clockwise = False
+        elif angle_diff_radians > 0 and abs(angle_diff_radians) >= math.pi:
+            clockwise = True
+        elif angle_diff_radians < 0 and abs(angle_diff_radians) < math.pi:
+            clockwise = True
+        else:
+            clockwise = False
+        # Rotate the proper direction if needed
+        if current_angle_radians != target_angle_radians and clockwise:
+            current_angle_radians -= rot_speed_radians
+        elif current_angle_radians != target_angle_radians:
+            current_angle_radians += rot_speed_radians
+        # Keep in a range of 0 to 2pi
+        if current_angle_radians > 2 * math.pi:
+            current_angle_radians -= 2 * math.pi
+        elif current_angle_radians < 0:
+            current_angle_radians += 2 * math.pi
+        # Convert back to degrees
+        self.hull_sprite.angle = math.degrees(current_angle_radians) - 90
 
 class Game(arcade.Window):
     def __init__(self):
@@ -251,7 +295,7 @@ class Game(arcade.Window):
         self.tree_list = arcade.SpriteList()
         self.rock_list = arcade.SpriteList()
         self.player_bullet_sprites = arcade.SpriteList()
-        self.enemies_sprites = arcade.SpriteList()
+        #self.enemies_sprites = arcade.SpriteList()
         
 
     def setup(self):
@@ -273,8 +317,6 @@ class Game(arcade.Window):
             enemy.hull_sprite.center_x = random.randint(50, SCREEN_WIDTH - 50)
             enemy.hull_sprite.center_y = random.randint(450, SCREEN_HEIGHT - 50)
             self.enemies_list.append(enemy)
-            enemy_sprite = [enemy.hull_sprite, enemy.turret_sprite]
-            self.enemies_sprites.extend(enemy_sprite)
 
     def on_draw(self):
         arcade.start_render()
@@ -283,7 +325,10 @@ class Game(arcade.Window):
         self.tree_list.draw()
         self.rock_list.draw()
         for enemy in self.enemies_list:
-            enemy.on_draw()
+            if enemy.hull_sprite.center_y < self.player.hull_sprite.center_y + 550: 
+                enemy.spawned_in = True
+            if enemy.spawned_in == True:
+                enemy.on_draw()
 
     def on_update(self, delta_time: float):
         self.check_keys()
@@ -294,25 +339,37 @@ class Game(arcade.Window):
 
         # Enemy targeting
         for enemy in self.enemies_list:
-            player_target = enemy.aim_at_player(self.player.hull_sprite.center_x, self.player.hull_sprite.center_y)
-            enemy.rotate_turret(player_target)
+            if enemy.spawned_in == True:
+                enemy.screen_edge(SCREEN_WIDTH, SCREEN_HEIGHT)
+                enemy.forward()
+                player_target = enemy.aim_at_player(self.player.hull_sprite.center_x, self.player.hull_sprite.center_y)
+                enemy.rotate_turret(player_target)
+                enemy.rotate_hull(player_target)
 
         for bullet in self.player_bullets:
             bullet.update()
         # Check the bullets for collisions and if they are off screen.
         for bullet in self.player_bullet_sprites:
-            bullet_hit = arcade.check_for_collision_with_lists(bullet, [self.tree_list, self.rock_list, self.enemies_sprites], 2)
-            if len(bullet_hit) > 0:
+            bullet_hit_environment = arcade.check_for_collision_with_lists(bullet, [self.tree_list, self.rock_list,], 2)
+            if len(bullet_hit_environment) > 0:
                 bullet.remove_from_sprite_lists()
             if bullet.bottom > SCREEN_HEIGHT or bullet.left > SCREEN_WIDTH or bullet.bottom < 0 or bullet.left < 0:
                 bullet.remove_from_sprite_lists()
             # Check trees for collision with bullets
             for tree in self.tree_list:
-                if tree in bullet_hit:
+                if tree in bullet_hit_environment:
                     tree.remove_from_sprite_lists()
-            for enemy in self.enemies_sprites:
-                if enemy in bullet_hit:
-                    enemy.remove_from_sprite_lists()
+            
+            for enemy in self.enemies_list:
+                if enemy.spawned_in == True:
+                    bullet_hit_enemy = arcade.check_for_collision(bullet, enemy.hull_sprite)
+                    for bullet_obj in self.player_bullets:
+                        if bullet_hit_enemy:
+                            enemy.take_damage(bullet_obj.damage)
+                            bullet.remove_from_sprite_lists()
+                            self.player_bullets.remove(bullet_obj)
+                            if enemy.hit_points <= 0:
+                                self.enemies_list.remove(enemy)
         
     def check_keys(self):
         if arcade.key.LEFT in self.key_list or arcade.key.A in self.key_list:
