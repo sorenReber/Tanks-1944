@@ -9,13 +9,13 @@ from classes.enemy import *
 
 class Game(arcade.Window):
     def __init__(self, screen_x, screen_y, title):
-        self.screen_x = screen_x
-        self.screen_y = screen_y
-        super().__init__(screen_x, screen_y, title, center_window=True)
+        self.widthx = screen_x
+        self.heighty = screen_y
+        super().__init__(self.widthx, self.heighty, title, center_window=True)
         arcade.Window.maximize(self)
         arcade.set_background_color(arcade.color.ARMY_GREEN)
         # Initialize player
-        self.player = Player(self.screen_x)
+        self.player = Player(self.widthx)
         # Start Music
         bg_music = arcade.load_sound(":resources:music/1918.mp3", True)
         arcade.play_sound(bg_music, looping= True)
@@ -32,23 +32,23 @@ class Game(arcade.Window):
         # Create a random number of trees and add to the tree_list.
         for _ in range(random.randint(5, 15)):
             tree = Tree()
-            tree.sprite.center_x = random.randint(35, self.screen_x - 35)
-            tree.sprite.center_y = random.randint(50, self.screen_y - 35)
+            tree.sprite.center_x = random.randint(35, self.widthx - 35)
+            tree.sprite.center_y = random.randint(50, self.heighty - 35)
             self.tree_list.append(tree.sprite)
 
         # Create a random number of rocks and add to the rock_list.
         for _ in range(random.randint(8, 20)):
             rock = Rock()
-            rock.sprite.center_x = random.randint(35, self.screen_x - 35)
-            rock.sprite.center_y = random.randint(50, self.screen_y - 35)
+            rock.sprite.center_x = random.randint(35, self.widthx - 35)
+            rock.sprite.center_y = random.randint(50, self.heighty - 35)
             rock.sprite.angle = random.randrange(0, 180)
             self.rock_list.append(rock.sprite)
 
         # Create an initial number of enemies 
         for _ in range(random.randint(3, 5)):
             enemy = Enemy()
-            enemy.hull_sprite.center_x = random.randint(10, self.screen_x - 10)
-            enemy.hull_sprite.center_y = random.randint(self.screen_y + 10, self.screen_y + 150)
+            enemy.hull_sprite.center_x = random.randint(10, self.widthx - 10)
+            enemy.hull_sprite.center_y = random.randint(self.heighty + 10, self.heighty + 150)
             enemy.turret_sprite.center_x = enemy.hull_sprite.center_x
             enemy.turret_sprite.center_y = enemy.hull_sprite.center_y
             self.enemies_list.append(enemy)
@@ -60,7 +60,7 @@ class Game(arcade.Window):
         self.tree_list.draw()
         self.rock_list.draw()
         for enemy in self.enemies_list:
-            if enemy.hull_sprite.center_y < self.screen_y + 150 : 
+            if enemy.hull_sprite.center_y < self.heighty + 150 : 
                 enemy.spawned_in = True
             if enemy.spawned_in == True:
                 enemy.on_draw()
@@ -68,7 +68,7 @@ class Game(arcade.Window):
     def on_update(self, delta_time: float):
         self.check_keys()
         self.player.deceleration()
-        self.player.screen_edge(self.screen_x, self.screen_y)
+        self.player.screen_edge(self.widthx, self.heighty)
         self.player.rotate_turret(self.player.target_angle)
         self.player.reload()
 
@@ -87,7 +87,7 @@ class Game(arcade.Window):
             bullet_hit_environment = arcade.check_for_collision_with_lists(bullet, [self.tree_list, self.rock_list,], 2)
             if len(bullet_hit_environment) > 0:
                 bullet.remove_from_sprite_lists()
-            if bullet.bottom > self.screen_y or bullet.left >self.screen_x or bullet.bottom < 0 or bullet.left < 0:
+            if bullet.bottom > self.heighty or bullet.left >self.widthx or bullet.bottom < 0 or bullet.left < 0:
                 bullet.remove_from_sprite_lists()
             # Check trees for collision with bullets
             for tree in self.tree_list:

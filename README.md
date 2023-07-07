@@ -43,6 +43,6 @@ Arcade
 _____________________________
 * New Future additions
 _____________________________
-* Enemies that move and shoot back!
+* ~~Enemies that move~~ and shoot back!
 * Different tank types, ablity to choose the player tank as mentioned above. Different stats dependent on the type of tank, i.e. damage/armor piercing, damage resistance/armor, top speed, acceleration, etc.
 * Bullet deviation, it shouldn't be a laser straight shot. Scale with distance, small to medium chance for shot to fall short or over shoot?

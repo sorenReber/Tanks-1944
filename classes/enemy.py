@@ -5,8 +5,8 @@ from classes.tank_base import Tank
 # Attempt at AI enemy - Motionless at first!
 class Enemy(Tank):
     def __init__(self):
-        super().__init__("ww2_tanks_top_export\Tiger\ww2_top_view_hull3.png",
-                        "ww2_tanks_top_export\Tiger\ww2_top_view_turret3.png")
+        super().__init__("Tanks 1944\ww2_tanks_top_export\Tiger\ww2_top_view_hull3.png",
+                        "Tanks 1944\ww2_tanks_top_export\Tiger\ww2_top_view_turret3.png")
         self.max_speed = .35
         #self.max_reverse_speed = -0.25
         self.acceleration = 0.005
