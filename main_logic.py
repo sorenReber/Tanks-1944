@@ -21,11 +21,13 @@ class Game(arcade.Window):
         arcade.play_sound(bg_music, looping= True)
         # Lists
         self.player_bullets = []
+        self.enemy_bullets = []
         self.enemies_list = []
         self.key_list = set()
         self.tree_list = arcade.SpriteList()
         self.rock_list = arcade.SpriteList()
         self.player_bullet_sprites = arcade.SpriteList()
+        self.enemy_bullet_sprites = arcade.SpriteList()
 
         
     def setup(self):
@@ -56,6 +58,7 @@ class Game(arcade.Window):
     def on_draw(self):
         arcade.start_render()
         self.player_bullet_sprites.draw()
+        self.enemy_bullet_sprites.draw()
         self.player.on_draw()
         self.tree_list.draw()
         self.rock_list.draw()
@@ -74,29 +77,55 @@ class Game(arcade.Window):
 
         # Enemy targeting
         for enemy in self.enemies_list:
-            enemy.forward()
             if enemy.spawned_in == True:
+                enemy.forward()
+                enemy.reload()
                 player_target = enemy.aim_at_player(self.player.hull_sprite.center_x, self.player.hull_sprite.center_y)
                 enemy.rotate_turret(player_target)
                 enemy.rotate_hull(player_target)
+                print(f"player target = {player_target}")
+                print(enemy.turret_sprite.angle)
+                #while player_target == 0:
+                if enemy.reloading == False:
+                    enemy_bullet = Enemy_bullet()
+                    enemy_bullet.sprite.angle = enemy.turret_sprite.angle + (.25 * random.randint(-20, 20))
+                    enemy_bullet.sprite.center_x = enemy.turret_sprite.center_x
+                    enemy_bullet.sprite.center_y = enemy.turret_sprite.center_y
+                    # Play the tank cannon sound
+                    arcade.play_sound(enemy_bullet.sound)
+                    self.enemy_bullets.append(enemy_bullet)
+                    self.enemy_bullet_sprites.append(enemy_bullet.sprite)
+                    # Sets the reload to true so there is time between shots.
+                    enemy.reloading = True
+                    enemy.reload_timer = 0
 
+        # Update bullets
         for bullet in self.player_bullets:
             bullet.update()
+            bullet_hit_environment = bullet.check_collisions(self.tree_list, self.rock_list)
+            if bullet_hit_environment:
+                self.player_bullets.remove(bullet)
+            if bullet.center_y > self.heighty or bullet.center_x > self.widthx or bullet.center_x < 0 or bullet.center_y < 0:
+                self.player_bullets.remove(bullet)
+        for bullet in self.enemy_bullets:
+            bullet.update()
+            bullet_hit_environment = bullet.check_collisions(self.tree_list, self.rock_list)
+            if bullet_hit_environment:
+                self.enemy_bullets.remove(bullet)
+            if bullet.center_y > self.heighty or bullet.center_x > self.widthx or bullet.center_x < 0 or bullet.center_y < 0:
+                self.player_bullets.remove(bullet)
+
         # Check the bullets for collisions and if they are off screen.
         for bullet in self.player_bullet_sprites:
             bullet_hit_environment = arcade.check_for_collision_with_lists(bullet, [self.tree_list, self.rock_list,], 2)
             if len(bullet_hit_environment) > 0:
                 bullet.remove_from_sprite_lists()
-            if bullet.bottom > self.heighty or bullet.left >self.widthx or bullet.bottom < 0 or bullet.left < 0:
+            if bullet.bottom > self.heighty or bullet.left > self.widthx or bullet.bottom < 0 or bullet.left < 0:
                 bullet.remove_from_sprite_lists()
             # Check trees for collision with bullets
             for tree in self.tree_list:
                 if tree in bullet_hit_environment:
                     tree.remove_from_sprite_lists()
-            for bullet_obj in self.player_bullets:
-                        if bullet_hit_environment:
-                            self.player_bullets.remove(bullet_obj)
-
             for enemy in self.enemies_list:
                 if enemy.spawned_in == True:
                     bullet_hit_enemy = arcade.check_for_collision(bullet, enemy.hull_sprite)
@@ -107,6 +136,16 @@ class Game(arcade.Window):
                             self.player_bullets.remove(bullet_obj)
                             if enemy.hit_points <= 0:
                                 self.enemies_list.remove(enemy)
+        for bullet in self.enemy_bullet_sprites:
+            bullet_hit_environment = arcade.check_for_collision_with_lists(bullet, [self.tree_list, self.rock_list,], 2)
+            if len(bullet_hit_environment) > 0:
+                bullet.remove_from_sprite_lists()
+            if bullet.bottom > self.heighty or bullet.left >self.widthx or bullet.bottom < 0 or bullet.left < 0:
+                bullet.remove_from_sprite_lists()
+            # Check trees for collision with bullets
+            for tree in self.tree_list:
+                if tree in bullet_hit_environment:
+                    tree.remove_from_sprite_lists()
 
     def check_keys(self):
         if arcade.key.LEFT in self.key_list or arcade.key.A in self.key_list:
@@ -132,7 +171,7 @@ class Game(arcade.Window):
         # Creates a bullet sprite and object. Append the sprite to a sprite list and the object to an object list.
         if self.player.reloading == False:
             player_bullet = Player_bullet()
-            player_bullet.sprite.angle = self.player.turret_sprite.angle
+            player_bullet.sprite.angle = self.player.turret_sprite.angle + (.1*random.randint(-8, 8))
             player_bullet.sprite.center_x = self.player.turret_sprite.center_x
             player_bullet.sprite.center_y = self.player.turret_sprite.center_y
             # Play the tank cannon sound

@@ -9,4 +9,4 @@ class Tree(Environment):
 
 class Rock(Environment):
     def __init__(self):
-        super().__init__('Tanks 1944/environment_png/rock_2.png')
+        super().__init__('environment_png/rock_2.png')

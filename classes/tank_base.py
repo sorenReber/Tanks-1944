@@ -15,14 +15,14 @@ class Tank():
         self.hull_sprite.center_x = 0
         self.hull_sprite.center_y = 0
         self.hull_sprite.angle = 0
-        self.hull_traverse = 0.5
+        self.hull_traverse = 0.15
 
         # Turret
         self.turret_sprite = arcade.Sprite(turret_img, 1)
         self.turret_sprite.center_x = self.hull_sprite.center_x
         self.turret_sprite.center_y = self.hull_sprite.center_y
         self.turret_sprite.angle = 0
-        self.turret_traverse = 0.25
+        self.turret_traverse = 0.35
 
     def on_draw(self):
         self.hull_sprite.draw()

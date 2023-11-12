@@ -1,3 +1,10 @@
+11/12/2023 v.0004
+- Tweaked variables for hull traverse and turret traverse, still need adjustment but the idea is that your turret turns faster than the 
+hull. Still need to break down each tank to have different attributes.
+- Enemies will now fire at the player. They mainly just fire in general but they are always targeting the player. Attempted to get the 
+enemy to only fire when the turret is lined up with the player but haven't figured out the logic yet.
+- Enemy 'bullets' behave like the players when interacting with the environment, but don't interact with the player.
+
 6/11/2023 v.0003
 - Broke the code into multiple files, partially as a test to see how it would work but also to help find specific parts of the game as things
 keep getting added. I'm also thinking about switching the engine to pygame as Kivy uses that and I think that would make it simpler to add

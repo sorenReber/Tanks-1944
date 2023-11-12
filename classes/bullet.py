@@ -5,9 +5,11 @@ class Bullet():
     def __init__(self):
         self.damage = 0
         self.bullet_speed = 5
-        self.sprite = arcade.Sprite("Tanks 1944/bullet.png", .25, flipped_vertically=True)
+        self.sprite = arcade.Sprite("bullet.png", .25, flipped_vertically=True)
         self.sprite.angle = 0
-        self.sound = arcade.load_sound("Tanks 1944/tank-fire.wav")
+        self.sound = arcade.load_sound("tank-fire.wav")
+        self.center_x = self.sprite.center_x
+        self.center_y = self.sprite.center_y
     
     def update(self):
         self.sprite.center_x += math.cos(math.radians(self.sprite.angle + 90)) * (self.bullet_speed)
@@ -20,10 +22,10 @@ class Bullet():
 class Player_bullet(Bullet):
     def __init__(self):
         super().__init__()
-        self.damage = 50
+        self.damage = 25
         self.bullet_speed = 5.5
 
 class Enemy_bullet(Bullet):
     def __init__(self):
         super().__init__()
-        self.damage = 25
+        self.damage = 50

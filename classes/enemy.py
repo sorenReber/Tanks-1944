@@ -1,17 +1,18 @@
 import arcade
 import math
-from classes.tank_base import Tank
+import random
+from .tank_base import Tank
 
 # Attempt at AI enemy - Motionless at first!
 class Enemy(Tank):
     def __init__(self):
-        super().__init__("Tanks 1944\ww2_tanks_top_export\Tiger\ww2_top_view_hull3.png",
-                        "Tanks 1944\ww2_tanks_top_export\Tiger\ww2_top_view_turret3.png")
-        self.max_speed = .35
+        super().__init__("ww2_tanks_top_export\Tiger\ww2_top_view_hull3.png",
+                        "ww2_tanks_top_export\Tiger\ww2_top_view_turret3.png")
+        self.max_speed = .25
         #self.max_reverse_speed = -0.25
-        self.acceleration = 0.005
+        self.acceleration = 0.0025
         self.hit_points = 100
-        self.reload_speed = 180
+        self.reload_speed = 180 + random.randint(10,50)
         self.reload_timer = 0
         self.reloading = False
         # Hull
@@ -25,6 +26,13 @@ class Enemy(Tank):
         self.turret_sprite.angle = 180
         # AI? Bot behavior?
         self.spawned_in = False
+
+    def reload(self):
+        if self.reloading:
+            self.reload_timer += 1
+        if self.reload_timer == self.reload_speed:
+            self.reloading = False
+            self.reload_timer = 0
 
     def aim_at_player(self, target_x, target_y):
         x_diff = target_x - self.hull_sprite.center_x

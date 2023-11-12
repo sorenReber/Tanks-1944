@@ -1,14 +1,14 @@
 import arcade
 import math
-from classes.tank_base import Tank
+from .tank_base import Tank
 
 class Player(Tank):
     def __init__(self, screen_x):
-        super().__init__("Tanks 1944\ww2_tanks_top_export\Sherman\ww2_top_view_hull10.png",
-                        "Tanks 1944\ww2_tanks_top_export\Sherman\ww2_top_view_turret10.png")
+        super().__init__("ww2_tanks_top_export\Sherman\ww2_top_view_hull10.png",
+                        "ww2_tanks_top_export\Sherman\ww2_top_view_turret10.png")
         self.max_speed = .75
         self.max_reverse_speed = -0.25
-        self.acceleration = 0.005
+        self.acceleration = 0.0025
         self.hit_points = 100
         self.reload_speed = 180
         self.reload_timer = 0
