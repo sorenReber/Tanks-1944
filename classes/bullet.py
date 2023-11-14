@@ -22,7 +22,7 @@ class Bullet():
 class Player_bullet(Bullet):
     def __init__(self):
         super().__init__()
-        self.damage = 25
+        self.damage = 50
         self.bullet_speed = 5.5
 
 class Enemy_bullet(Bullet):

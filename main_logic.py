@@ -53,7 +53,8 @@ class Game(arcade.Window):
             enemy.hull_sprite.center_y = random.randint(self.heighty + 10, self.heighty + 150)
             enemy.turret_sprite.center_x = enemy.hull_sprite.center_x
             enemy.turret_sprite.center_y = enemy.hull_sprite.center_y
-            self.enemies_list.append(enemy)
+            self.enemies_list.append(enemy) 
+            # Idea: For enemies, create a crew experience value on spawning that affects the tank +/- in different ways.
 
     def on_draw(self):
         arcade.start_render()
@@ -77,15 +78,17 @@ class Game(arcade.Window):
 
         # Enemy targeting
         for enemy in self.enemies_list:
+            if enemy.hit_points <= 0:
+                    self.enemies_list.remove(enemy)
+                    enemy.spawned_in = False
             if enemy.spawned_in == True:
                 enemy.forward()
                 enemy.reload()
                 player_target = enemy.aim_at_player(self.player.hull_sprite.center_x, self.player.hull_sprite.center_y)
                 enemy.rotate_turret(player_target)
                 enemy.rotate_hull(player_target)
-                print(f"player target = {player_target}")
-                print(enemy.turret_sprite.angle)
                 #while player_target == 0:
+
                 if enemy.reloading == False:
                     enemy_bullet = Enemy_bullet()
                     enemy_bullet.sprite.angle = enemy.turret_sprite.angle + (.25 * random.randint(-20, 20))
@@ -134,8 +137,7 @@ class Game(arcade.Window):
                             enemy.take_damage(bullet_obj.damage)
                             bullet.remove_from_sprite_lists()
                             self.player_bullets.remove(bullet_obj)
-                            if enemy.hit_points <= 0:
-                                self.enemies_list.remove(enemy)
+        # Enemy Bullet Logic                    
         for bullet in self.enemy_bullet_sprites:
             bullet_hit_environment = arcade.check_for_collision_with_lists(bullet, [self.tree_list, self.rock_list,], 2)
             if len(bullet_hit_environment) > 0:
