@@ -1,3 +1,9 @@
+11/18/2023 v.0005
+- Created a function for the enemy that will check if the player is within a given range. The enemies will now not turn the hull or turret,
+or fire until the player is within different ranges. Need to implement a intersect within a line going out the enemy tank barrel and if the
+line intersects the players sprite then the enemy will fire. Currently they fire as soon as the player is within range.
+- Implemented a crew training variable that should allow for some differences in how enemies behave.
+
 11/12/2023 v.0004
 - Tweaked variables for hull traverse and turret traverse, still need adjustment but the idea is that your turret turns faster than the 
 hull. Still need to break down each tank to have different attributes.

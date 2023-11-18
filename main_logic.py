@@ -51,8 +51,11 @@ class Game(arcade.Window):
             enemy = Enemy()
             enemy.hull_sprite.center_x = random.randint(10, self.widthx - 10)
             enemy.hull_sprite.center_y = random.randint(self.heighty + 10, self.heighty + 150)
+            player_target = enemy.aim_at_player(self.player.hull_sprite.center_x, self.player.hull_sprite.center_y)
+            enemy.hull_sprite.angle += player_target
             enemy.turret_sprite.center_x = enemy.hull_sprite.center_x
             enemy.turret_sprite.center_y = enemy.hull_sprite.center_y
+            enemy.crew_training = .01 * random.randint(-10,50)
             self.enemies_list.append(enemy) 
             # Idea: For enemies, create a crew experience value on spawning that affects the tank +/- in different ways.
 
@@ -85,22 +88,24 @@ class Game(arcade.Window):
                 enemy.forward()
                 enemy.reload()
                 player_target = enemy.aim_at_player(self.player.hull_sprite.center_x, self.player.hull_sprite.center_y)
-                enemy.rotate_turret(player_target)
-                enemy.rotate_hull(player_target)
-                #while player_target == 0:
-
-                if enemy.reloading == False:
-                    enemy_bullet = Enemy_bullet()
-                    enemy_bullet.sprite.angle = enemy.turret_sprite.angle + (.25 * random.randint(-20, 20))
-                    enemy_bullet.sprite.center_x = enemy.turret_sprite.center_x
-                    enemy_bullet.sprite.center_y = enemy.turret_sprite.center_y
-                    # Play the tank cannon sound
-                    arcade.play_sound(enemy_bullet.sound)
-                    self.enemy_bullets.append(enemy_bullet)
-                    self.enemy_bullet_sprites.append(enemy_bullet.sprite)
-                    # Sets the reload to true so there is time between shots.
-                    enemy.reloading = True
-                    enemy.reload_timer = 0
+                player_near = enemy.player_range_check (self.player.hull_sprite.center_x, self.player.hull_sprite.center_y, 1100)
+                if player_near:
+                    enemy.rotate_hull(player_target)
+                    player_in_range = enemy.player_range_check (self.player.hull_sprite.center_x, self.player.hull_sprite.center_y, 800)
+                    if player_in_range:
+                        enemy.rotate_turret(player_target)
+                        if enemy.reloading == False:
+                            enemy_bullet = Enemy_bullet()
+                            enemy_bullet.sprite.angle = enemy.turret_sprite.angle + (.25 * random.randint(-20, 20))
+                            enemy_bullet.sprite.center_x = enemy.turret_sprite.center_x
+                            enemy_bullet.sprite.center_y = enemy.turret_sprite.center_y
+                            # Play the tank cannon sound
+                            arcade.play_sound(enemy_bullet.sound)
+                            self.enemy_bullets.append(enemy_bullet)
+                            self.enemy_bullet_sprites.append(enemy_bullet.sprite)
+                            # Sets the reload to true so there is time between shots.
+                            enemy.reloading = True
+                            enemy.reload_timer = 0
 
         # Update bullets
         for bullet in self.player_bullets:

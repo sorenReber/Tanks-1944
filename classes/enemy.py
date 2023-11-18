@@ -9,23 +9,27 @@ class Enemy(Tank):
         super().__init__("ww2_tanks_top_export\Tiger\ww2_top_view_hull3.png",
                         "ww2_tanks_top_export\Tiger\ww2_top_view_turret3.png")
         self.max_speed = .25
+        self.crew_training = 0
         #self.max_reverse_speed = -0.25
-        self.acceleration = 0.0025
+        self.acceleration = 0.0025 + (self.crew_training *.001)
         self.hit_points = 100
-        self.reload_speed = 180 + random.randint(10,50)
+        self.reload_speed = 180 + (self.crew_training * 50)
         self.reload_timer = 0
         self.reloading = False
         # Hull
         self.hull_sprite.center_x = 0
         self.hull_sprite.center_y = 0
         self.hull_sprite.angle = 180
+        self.hull_traverse = self.hull_traverse + (self.crew_training / 3)
         # Turret
         self.target_angle = 0
         self.turret_sprite.center_x = self.hull_sprite.center_x
         self.turret_sprite.center_y = self.hull_sprite.center_y
         self.turret_sprite.angle = 180
+        self.turret_traverse = self.turret_traverse + (self.crew_training / 2)
         # AI? Bot behavior?
         self.spawned_in = False
+        
 
     def reload(self):
         if self.reloading:
@@ -33,6 +37,14 @@ class Enemy(Tank):
         if self.reload_timer == self.reload_speed:
             self.reloading = False
             self.reload_timer = 0
+    
+    def player_range_check (self, target_x, target_y, range):
+        x_diff = target_x - self.hull_sprite.center_x
+        y_diff = target_y - self.hull_sprite.center_y
+        if abs(x_diff) <= range and abs(y_diff) <= range:
+            return True
+        else:
+            return False
 
     def aim_at_player(self, target_x, target_y):
         x_diff = target_x - self.hull_sprite.center_x
