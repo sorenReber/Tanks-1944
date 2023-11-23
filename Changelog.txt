@@ -1,3 +1,7 @@
+11/23/2023 v.0006
+- Worked out the math to have the enemy only fire when the turret is lined up with the player. Ran into an issue where they don't fire if
+the player is above them, causing a positive target angle. Added in elif statement to remedy the issue.
+
 11/18/2023 v.0005
 - Created a function for the enemy that will check if the player is within a given range. The enemies will now not turn the hull or turret,
 or fire until the player is within different ranges. Need to implement a intersect within a line going out the enemy tank barrel and if the

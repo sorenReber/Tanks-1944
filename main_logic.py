@@ -88,24 +88,40 @@ class Game(arcade.Window):
                 enemy.forward()
                 enemy.reload()
                 player_target = enemy.aim_at_player(self.player.hull_sprite.center_x, self.player.hull_sprite.center_y)
-                player_near = enemy.player_range_check (self.player.hull_sprite.center_x, self.player.hull_sprite.center_y, 1100)
+                player_near = enemy.player_range_check (self.player.hull_sprite.center_x, self.player.hull_sprite.center_y, 1000)
                 if player_near:
                     enemy.rotate_hull(player_target)
                     player_in_range = enemy.player_range_check (self.player.hull_sprite.center_x, self.player.hull_sprite.center_y, 800)
                     if player_in_range:
                         enemy.rotate_turret(player_target)
-                        if enemy.reloading == False:
-                            enemy_bullet = Enemy_bullet()
-                            enemy_bullet.sprite.angle = enemy.turret_sprite.angle + (.25 * random.randint(-20, 20))
-                            enemy_bullet.sprite.center_x = enemy.turret_sprite.center_x
-                            enemy_bullet.sprite.center_y = enemy.turret_sprite.center_y
-                            # Play the tank cannon sound
-                            arcade.play_sound(enemy_bullet.sound)
-                            self.enemy_bullets.append(enemy_bullet)
-                            self.enemy_bullet_sprites.append(enemy_bullet.sprite)
-                            # Sets the reload to true so there is time between shots.
-                            enemy.reloading = True
-                            enemy.reload_timer = 0
+                        if (math.degrees(player_target)) == (enemy.turret_sprite.angle - 270):
+                            if enemy.reloading == False:
+                                enemy_bullet = Enemy_bullet()
+                                enemy_bullet.sprite.angle = enemy.turret_sprite.angle + (.25 * random.randint(-20, 20))
+                                enemy_bullet.sprite.center_x = enemy.turret_sprite.center_x
+                                enemy_bullet.sprite.center_y = enemy.turret_sprite.center_y
+                                # Play the tank cannon sound
+                                arcade.play_sound(enemy_bullet.sound)
+                                self.enemy_bullets.append(enemy_bullet)
+                                self.enemy_bullet_sprites.append(enemy_bullet.sprite)
+                                # Sets the reload to true so there is time between shots.
+                                enemy.reloading = True
+                                enemy.reload_timer = 0
+                        elif (math.degrees(player_target)) == (enemy.turret_sprite.angle + 90):
+                            if enemy.reloading == False:
+                                enemy_bullet = Enemy_bullet()
+                                enemy_bullet.sprite.angle = enemy.turret_sprite.angle + (.25 * random.randint(-20, 20))
+                                enemy_bullet.sprite.center_x = enemy.turret_sprite.center_x
+                                enemy_bullet.sprite.center_y = enemy.turret_sprite.center_y
+                                # Play the tank cannon sound
+                                arcade.play_sound(enemy_bullet.sound)
+                                self.enemy_bullets.append(enemy_bullet)
+                                self.enemy_bullet_sprites.append(enemy_bullet.sprite)
+                                # Sets the reload to true so there is time between shots.
+                                enemy.reloading = True
+                                enemy.reload_timer = 0
+                    else:
+                        enemy.rotate_turret(math.radians(enemy.hull_sprite.angle+90))
 
         # Update bullets
         for bullet in self.player_bullets:
