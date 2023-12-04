@@ -3,7 +3,7 @@ import math
 import random
 from .tank_base import Tank
 
-# Attempt at AI enemy - Motionless at first!
+# Attempt at AI enemy
 class Enemy(Tank):
     def __init__(self):
         super().__init__("ww2_tanks_top_export\Tiger\ww2_top_view_hull3.png",
